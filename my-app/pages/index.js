@@ -6,21 +6,20 @@ import { useEffect, useRef, useState } from "react";
 import { WHITELIST_CONTRACT_ADDRESS, abi } from "../constants";
 
 export default function Home() {
-
   const [walletConnected, setWalletConnected] = useState(false);
   const [joinedWhitelist, setJoinedWhitelist] = useState(false);
   const [loading, setLoading] = useState(false);
   const [numberOfWhitelisted, setNumberOfWhitelisted] = useState(0);
   const web3ModalRef = useRef();
-  
+
   const getProviderOrSigner = async (needSigner = false) => {
     const provider = await web3ModalRef.current.connect();
     const web3Provider = new providers.Web3Provider(provider);
 
     const { chainId } = await web3Provider.getNetwork();
-    if ( chainId !== 4 ) {
+    if (chainId !== 4) {
       window.alert("Change the network to Rinkeby");
-      throw new Error("Change the network to Rinkeby");
+      throw new Error("Change network to Rinkeby");
     }
 
     if (needSigner) {
@@ -28,56 +27,45 @@ export default function Home() {
       return signer;
     }
     return web3Provider;
-    };
+  };
 
-    const addAddressToWhitelist = async () => {
-      try {
-        const signer = await getProviderOrSigner(true);
-
-        const whitelistContract = new Contract(
-          WHITELIST_CONTRACT_ADDRESS,
-          abi,
-          signer
-        );
-
-        const tx = await whitelistContract.addAddressToWhitelist();
-        setLoading(true);
-
-        await tx.wait();
-        setLoading(false);
-
-        await getNumberofWhitelisted();
-        setJoinedWhitelist(true);
-
-        
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    /**
-   * getNumberOfWhitelisted:  gets the number of whitelisted addresses
-   */
-
-    const getNumberOfWhitelisted = async () => {
-      try {
-        const provider = await getProviderOrSigner();
-        const whitelistContract = new Contract(
-          WHITELIST_CONTRACT_ADDRESS,
-          abi,
-          provider
-        );
-
-        const _numberOfWhitelisted = await whitelistContract.numAddressesWhitelisted();
-        setNumberOfWhitelisted(_numberOfWhitelisted);
-      } catch (err) {
-        console.error(err);
-      }
+  const addAddressToWhitelist = async () => {
+    try {
+      const signer = await getProviderOrSigner(true);
+      const whitelistContract = new Contract(
+        WHITELIST_CONTRACT_ADDRESS,
+        abi,
+        signer
+      );
+      const tx = await whitelistContract.addAddressToWhitelist();
+      setLoading(true);
+      await tx.wait();
+      setLoading(false);
+      await getNumberOfWhitelisted();
+      setJoinedWhitelist(true);
+    } catch (err) {
+      console.error(err);
     }
-    
-    const checkIfAddressInWhitelist = async () => {
-    try{
-      const signer = await getProviderOrSigner(true)
+  };
+
+  const getNumberOfWhitelisted = async () => {
+    try {
+      const provider = await getProviderOrSigner();
+      const whitelistContract = new Contract(
+        WHITELIST_CONTRACT_ADDRESS,
+        abi,
+        provider
+      );
+      const _numberOfWhitelisted = await whitelistContract.numAddressesWhitelisted();
+      setNumberOfWhitelisted(_numberOfWhitelisted);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const checkIfAddressInWhitelist = async () => {
+    try {
+      const signer = await getProviderOrSigner(true);
       const whitelistContract = new Contract(
         WHITELIST_CONTRACT_ADDRESS,
         abi,
@@ -91,86 +79,83 @@ export default function Home() {
     } catch (err) {
       console.error(err);
     }
-    };
+  };
 
-    const connectWallet = async () => {
-      try {
-        await getProviderOrSigner();
-        setWalletConnected(false);
+  const connectWallet = async () => {
+    try {
+      await getProviderOrSigner();
+      setWalletConnected(true);
 
-        checkIfAddressInWhitelist();
-        getNumberOfWhitelisted();
-      } catch (err){
-        console.error(err);
-      }
-    };
-      
-    const renderButton = () => {
+      checkIfAddressInWhitelist();
+      getNumberOfWhitelisted();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+ 
+  const renderButton = () => {
     if (walletConnected) {
       if (joinedWhitelist) {
         return (
           <div className={styles.description}>
-            Congratulations! You have joined our Whitelist!
+            Thanks for joining the Whitelist!
           </div>
         );
       } else if (loading) {
-        return <button className={styles.button}>Loading...</button>
-        } else {
-          return (
-            <button onClick={addAddressToWhitelist} className={styles.button}>Join Whitelist</button>
-          );
-        }
+        return <button className={styles.button}>Loading...</button>;
       } else {
         return (
-          <button onClick={connectWallet} className={styles.button}>
-            Connect Wallet
+          <button onClick={addAddressToWhitelist} className={styles.button}>
+            Join the Whitelist
           </button>
         );
       }
-    };
-    
-    useEffect(() => {
-      if (!walletConnected) {
-        web3ModalRef.current = new Web3Modal({
-          network: "rinkeby",
-          providerOptions:{},
-          disableInjectedProvider: false,
-        });
-        connectWallet();
-      }
-    }, [walletConnected]);
-  
+    } else {
+      return (
+        <button onClick={connectWallet} className={styles.button}>
+          Connect your wallet
+        </button>
+      );
+    }
+  };
+  useEffect(() => {
+    if (!walletConnected) {
+      web3ModalRef.current = new Web3Modal({
+        network: "rinkeby",
+        providerOptions: {},
+        disableInjectedProvider: false,
+      });
+      connectWallet();
+    }
+  }, [walletConnected]);
 
   return (
     <div>
       <Head>
         <title>Whitelist Dapp</title>
-        <meta name="description" content="Whitelist-dapp" />
+        <meta name="description" content="Whitelist-Dapp" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <div className={styles.main}>
         <div>
-        <h1 className={styles.title}>
-          Welcome to Nick's Whitelist!
-        </h1>
-
-        <h1 className={styles.description}>
-          Exclusive whitelist for our NFT collection!</h1>
-        <div className={styles.description}>
-          {numberOfWhitelisted} have already joined the Whitelist
-        </div>
-        {renderButton()}
+          <h1 className={styles.title}>Welcome to Nicks Whitelist!</h1>
+          <div className={styles.description}>
+            This is a sample whitelist for an NFT collection.
+          </div>
+          <div className={styles.description}>
+            {numberOfWhitelisted} have already joined the Whitelist
+          </div>
+          {renderButton()}
         </div>
         <div>
-          <img className={styles.image} src="./crypto-devs.svg"/>          
+          <img className={styles.image} src="./crypto-devs.svg" />
         </div>
       </div>
-      
+
       <footer className={styles.footer}>
-      NFT's are revolutionary!
+        Made with &#10084; by Crypto Devs
       </footer>
-      </div>
+    </div>
   );
 }
-        
