@@ -138,13 +138,14 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.main}>
+        <div className=""
         <div>
-          <h1 className={styles.title}>Welcome to Nicks Whitelist!</h1>
+          <h1 className={styles.title}>Welcome to Nick's <text style={{ color: "blue" }}>NFT</text> Whitelist!</h1>
           <div className={styles.description}>
             This is a sample whitelist for an NFT collection.
           </div>
-          <div className={styles.description}>
-            {numberOfWhitelisted} have already joined the Whitelist!
+          <div className={styles.description}><text style={{ color: "blue", fontWeight: "bold" }} >
+            {numberOfWhitelisted}</text> have already joined the Whitelist!
           </div>
           {renderButton()}
         </div>
@@ -154,7 +155,7 @@ export default function Home() {
       </div>
 
       <footer className={styles.footer}>
-        NFT's Are Revolutionary!
+      Made with &#10084; by Nick Calhoun
       </footer>
     </div>
   );
