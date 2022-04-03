@@ -138,7 +138,6 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.main}>
-        <div className=""
         <div>
           <h1 className={styles.title}>Welcome to Nick's <text style={{ color: "blue" }}>NFT</text> Whitelist!</h1>
           <div className={styles.description}>
